@@ -1,10 +1,10 @@
 import { TouchableOpacity, View, Text } from "react-native";
 import React from "react";
 import { Link, Redirect, router, Stack } from "expo-router";
+import CustomButton from "./Utility/CustomButton";
 import * as WebBrowser from "expo-web-browser";
-import { useAuth, useClerk, useOAuth, useUser } from "@clerk/clerk-expo";
+import { useAuth, useClerk, useOAuth } from "@clerk/clerk-expo";
 import * as Linking from "expo-linking";
-import CustomButton from "../components/Utility/CustomButton";
 
 export const useWarmUpBrowser = () => {
   React.useEffect(() => {
@@ -17,7 +17,7 @@ export const useWarmUpBrowser = () => {
 
 WebBrowser.maybeCompleteAuthSession();
 
-const Index = () => {
+const Landing = () => {
   useWarmUpBrowser();
 
   const { startOAuthFlow } = useOAuth({ strategy: "oauth_google" });
@@ -26,20 +26,18 @@ const Index = () => {
     try {
       const { createdSessionId, signIn, signUp, setActive } =
         await startOAuthFlow({
-          redirectUrl: Linking.createURL("/home", { scheme: "newsbytes" }),
+          redirectUrl: Linking.createURL("/home", { scheme: "myapp" }),
         });
       if (createdSessionId) {
         setActive({ session: createdSessionId });
+      } else {
+        // Use signIn or signUp for next steps such as MFA
       }
     } catch (err) {
       console.error("OAuth error", err);
     }
   }, []);
 
-  const { isSignedIn } = useAuth();
-  if (isSignedIn) {
-    return <Redirect href={"/home"} />;
-  }
   return (
     <View className="bg-gray-950  py-10 h-full">
       <Text className="text-white font-bold  text-3xl">
@@ -57,4 +55,4 @@ const Index = () => {
   );
 };
 
-export default Index;
+export default Landing;
